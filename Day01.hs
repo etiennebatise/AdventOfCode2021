@@ -1,4 +1,4 @@
-module Day01 (dayOne) where 
+module Day01 (main) where 
 
 type Puzzle = [Int]
 
@@ -8,8 +8,8 @@ getPuzzle = (map read) <$> lines <$> readFile "./01.txt"
 solve :: Int -> Puzzle -> Int
 solve w p = length $ filter (<0) $ zipWith (\a b -> a - b) p (drop w p)
 
-dayOne :: IO ()
-dayOne = do
+main :: IO ()
+main = do
   putStrLn "Day One"
   puzzle <- getPuzzle
   putStr "Part one: "

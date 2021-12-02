@@ -1,5 +1,7 @@
-import Day01
+import qualified Day01
+import qualified Day02
 
 main = do
-  dayOne
+  Day01.main
+  Day02.main
 
