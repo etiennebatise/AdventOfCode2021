@@ -8,12 +8,12 @@ import Numeric
 import Util
 
 getPuzzle :: IO [String]
-getPuzzle = lines <$> readFile "./03.txt"
+getPuzzle = lines <$> readFile "./assets/03.txt"
 
 -- Part One
 
 parseLine :: [Sum Int] -> String -> [Sum Int]
-parseLine a = zipWith (<>) a . map (Sum . read . (:""))
+parseLine a = zipWith (<>) a . map (Sum . read . (: ""))
 
 sumLines :: [String] -> [Int]
 sumLines = map getSum . foldr (flip parseLine) (repeat mempty)
@@ -32,7 +32,7 @@ type Row = [Int]
 
 parts :: Int -> Row -> ([Row], [Row]) -> ([Row], [Row])
 parts index row (zeros, ones) =
-  bool (row:zeros, ones) (zeros, row:ones) (row !! index == 1) 
+  bool (row : zeros, ones) (zeros, row : ones) (row !! index == 1)
 
 type RatingRule = [Row] -> [Row] -> [Row]
 
@@ -43,16 +43,16 @@ carbon :: RatingRule
 carbon zeros ones = bool ones zeros (length zeros <= length ones)
 
 computeRating :: RatingRule -> Int -> [Row] -> [Int]
-computeRating rule _ (row:[]) = row
-computeRating rule i rows = computeRating rule (i+1) next
-  where 
+computeRating rule _ (row : []) = row
+computeRating rule i rows = computeRating rule (i + 1) next
+  where
     next = uncurry rule $ foldr (parts i) ([], []) rows
 
 solvePartTwo :: [String] -> Int
 solvePartTwo puzzle = oxygenRating * carbonRating
   where
     rows :: [Row]
-    rows = (map . map) (read . (:"")) puzzle
+    rows = (map . map) (read . (: "")) puzzle
     oxygenRating = binToDec $ computeRating oxygen 0 rows
     carbonRating = binToDec $ computeRating carbon 0 rows
 
@@ -64,5 +64,3 @@ main = do
   print $ solvePartOne puzzle
   putStr "Part two: "
   print $ solvePartTwo puzzle
-
-

@@ -23,7 +23,7 @@ command =  forward <|> up <|> down
 type Puzzle = [Command]
 
 getPuzzle :: IO (Either ParseError Puzzle)
-getPuzzle = traverse (parse command "") . lines <$> readFile "./02.txt"
+getPuzzle = traverse (parse command "") . lines <$> readFile "./assets/02.txt"
   
 -- Solver 
 type Interpreter state = state -> Command -> state
