@@ -43,6 +43,7 @@ executable AdventOfCode2021-exe
       Day02
       Day03
       Day04
+      Day05
       Util
       Paths_AdventOfCode2021
   hs-source-dirs:
