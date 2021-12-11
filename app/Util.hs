@@ -16,3 +16,9 @@ binToDec l = sum $ map (2 ^) $ findIndices (== 1) $ reverse l
 
 charToInt :: Char -> Int
 charToInt = read . (: "")
+
+(>.>) :: (a -> b) -> (b -> c) -> a -> c
+-- Reverse function composition (do f first, then g)
+(f >.> g) x = g (f x)
+
+infixr 1 >.>
