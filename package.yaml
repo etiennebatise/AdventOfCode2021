@@ -24,6 +24,9 @@ dependencies:
 - parsec
 - lens
 - array
+- doctest
+- QuickCheck
+- extra
 
 library:
   source-dirs: src

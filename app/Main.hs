@@ -7,6 +7,7 @@ import qualified Day06
 import qualified Day07
 import qualified Day08
 import qualified Day09
+import qualified Day10
 
 main = do
   --  Day01.main
@@ -17,4 +18,5 @@ main = do
   -- Day06.main
   -- Day07.main
   -- Day08.main
-  Day09.main
+  -- Day09.main
+  Day10.main
