@@ -27,6 +27,8 @@ dependencies:
 - doctest
 - QuickCheck
 - extra
+- mtl
+- monad-loops
 
 library:
   source-dirs: src
