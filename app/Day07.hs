@@ -46,7 +46,7 @@ partTwo (Puzzle ints) = snd $ fromJust $ foldr go Nothing [(foldr min 0 ints) ..
 
 main :: IO ()
 main = do
-  putStrLn "Day Five"
+  putStrLn "Day Seven"
   puzzle <- getPuzzle
   let Puzzle ints = puzzle
   let m = median ints

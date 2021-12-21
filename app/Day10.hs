@@ -109,7 +109,7 @@ solve (Puzzle p) s = score s $ map go p
 -- Main
 main :: IO ()
 main = do
-  putStrLn "Day Five"
+  putStrLn "Day Ten"
   puzzle <- getPuzzle
   let Puzzle lines = puzzle
   print $ length lines

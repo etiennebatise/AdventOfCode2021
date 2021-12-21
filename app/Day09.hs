@@ -72,7 +72,7 @@ partTwo p = product $ take 3 $ reverse $ sort $ map (length . basin p) $ lowPoin
 -- Main
 main :: IO ()
 main = do
-  putStrLn "Day Five"
+  putStrLn "Day Nine"
   puzzle <- getPuzzle
   putStr "Part one: "
   print $ partOne puzzle

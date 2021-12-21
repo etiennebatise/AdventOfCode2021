@@ -104,7 +104,7 @@ partTwo puzzle@(Puzzle arr) =
 
 main :: IO ()
 main = do
-  putStrLn "Day Five"
+  putStrLn "Day Eleven"
   puzzle@(Puzzle arr) <- getPuzzle
   print puzzle
   putStr "Part one: "

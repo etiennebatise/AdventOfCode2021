@@ -51,7 +51,7 @@ countElem i l = length $ elemIndices i l
 
 main :: IO ()
 main = do
-  putStrLn "Day Five"
+  putStrLn "Day Six"
   Puzzle ints <- getPuzzle
   let occ = flip countElem ints
   let oldFish = OldFish (occ 6) (occ 5) (occ 4) (occ 3) (occ 2) (occ 1) (occ 0)

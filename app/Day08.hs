@@ -85,7 +85,7 @@ partTwo (Puzzle row) = sum $partTwoRow <$> row
 
 main :: IO ()
 main = do
-  putStrLn "Day Five"
+  putStrLn "Day Eight"
   puzzle <- getPuzzle
   putStr "Part one: "
   print $ partOne puzzle
