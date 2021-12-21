@@ -33,7 +33,7 @@ newtype Puzzle = Puzzle (Array (Int, Int) Int)
 instance Show Puzzle where
   show (Puzzle arr) = mconcat . unlines' $ show <$> elems arr
     where
-      n = (1 +) $ fst $ snd $ bounds arr
+      n = (1 +) $ uncurry (-) $ snd $ bounds arr
       y = ['\n']
       unlines' :: [String] -> [String]
       unlines' xs = countdown n xs
