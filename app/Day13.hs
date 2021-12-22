@@ -47,7 +47,7 @@ getPuzzle :: IO Puzzle
 getPuzzle = unsafeRight . parse puzzle "" <$> readFile "./assets/13.txt"
 
 solve :: Puzzle -> [Position]
-solve (Puzzle dots folds) = foldl (flip go) dots folds
+solve (Puzzle dots folds) = nub $ foldl (flip go) dots folds
   where
     go :: Instruction -> [Position] -> [Position]
     go (Instruction X line) = fmap (first (sym line))
@@ -56,7 +56,7 @@ solve (Puzzle dots folds) = foldl (flip go) dots folds
     sym line coord = if coord < line then coord else line - (coord - line)
 
 partOne :: Puzzle -> Int
-partOne = length . nub . solve
+partOne = length . solve
 
 partTwo :: Puzzle -> String
 partTwo puzzle = snd $ foldl go (0, "") grid
@@ -64,7 +64,7 @@ partTwo puzzle = snd $ foldl go (0, "") grid
     go :: (Int, String) -> (Int, Int, Char) -> (Int, String)
     go (lastLine, s) (_, line, c) = if lastLine /= line then (line, s ++ ['\n', c]) else (line, s ++ [c])
 
-    dots = nub $ solve puzzle
+    dots = solve puzzle
 
     maxX = maximum $ fst <$> dots
     maxY = maximum $ snd <$> dots
