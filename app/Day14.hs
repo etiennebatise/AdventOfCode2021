@@ -1,17 +1,14 @@
 -- |
 module Day14 where
 
-import Control.Monad.State (MonadState (put), State, evalState, get, join, replicateM, runState, state)
-import Data.Array.ST (runSTUArray)
-import Data.Bifunctor (Bifunctor (second))
-import Data.Bits (Bits (bit))
-import Data.Function (on)
+import Control.Monad.State (State, evalState, replicateM, state)
+import Data.Bifunctor (Bifunctor (first, second))
 import Data.Functor (($>))
-import Data.List (sortOn)
-import Data.List.Extra (group, groupSort, sort, sortBy)
-import Data.Map (Map, adjust, alter, foldrWithKey', fromList, keys, toList, (!))
+import Data.List.Extra (groupSort)
+import Data.Map (Map, adjust, alter, foldrWithKey', fromList, toList, (!))
 import Data.Monoid (Sum (getSum), mconcat, mempty)
-import Text.Parsec (count, letter, many, many1, newline, parse, string)
+import Data.Tuple.Extra (dupe)
+import Text.Parsec (count, letter, many1, newline, parse, string)
 import Text.Parsec.String (Parser)
 import Util (unsafeRight)
 
@@ -31,13 +28,14 @@ rule = (,) <$> (pair <* string " -> ") <*> letter
 
 polymerFromString :: String -> PolymerTemplate
 polymerFromString s =
-  let zipped = zipWith (\a b -> ((a, b), 1 :: Sum Int)) s (tail s)
-      mapped = map (second mconcat) $ groupSort $ (zipped ++ [((last s, ' '), 1)])
+  let zipped = zipWith (\a b -> ((a, b), 1)) s (tail s)
+      lastElement = ((last s, ' '), 1)
+      mapped = second mconcat <$> groupSort (lastElement : zipped)
    in fromList mapped
 
 puzzle :: Parser Puzzle
 puzzle = do
-  polymerTemplate <- polymerFromString <$> many letter
+  polymerTemplate <- polymerFromString <$> many1 letter
   newline
   newline
   rules <- fromList <$> many1 (rule <* newline)
@@ -47,28 +45,26 @@ getPuzzle :: IO Puzzle
 getPuzzle = unsafeRight . parse puzzle "" <$> readFile "./assets/14.txt"
 
 computeQuantities :: PolymerTemplate -> Int
-computeQuantities polymer = getSum $ mostCommon <> negate leastCommon
+computeQuantities polymer = mostCommon - leastCommon
   where
-    x = sortOn snd $ map (second mconcat) $ groupSort $ uncurry ($>) <$> toList polymer
-    leastCommon = snd $ head x
-    mostCommon = snd $ last x
+    mostCommon = maximum occurences
+    leastCommon = minimum occurences
+    occurences = getSum . mconcat . snd <$> groupSort (mapOccurrences <$> toList polymer)
+    mapOccurrences = uncurry ($>)
 
 runStep :: PairInsertionRules -> State PolymerTemplate Int
 runStep rules = state go
   where
-    go :: PolymerTemplate -> (Int, PolymerTemplate)
-    go polymer =
-      let newPolymer = foldrWithKey' processPair polymer polymer
-       in (computeQuantities newPolymer, newPolymer)
+    go = first computeQuantities . dupe . processPolymer
+
+    processPolymer polymer = foldrWithKey' processPair polymer polymer
 
     processPair :: (Char, Char) -> Sum Int -> PolymerTemplate -> PolymerTemplate
     processPair (a, ' ') _ polymer = polymer
     processPair pair count polymer =
-      let newPairs = subPairs pair
-       in decrease count pair $ foldr (upsert count) polymer newPairs
+      decrease count pair $ foldr (upsert count) polymer $ subPairs pair
 
-    subPairs t@(a, b) = [(a, ruleFor t), (ruleFor t, b)]
-    ruleFor t = rules ! t
+    subPairs pair@(a, b) = [(a, rules ! pair), (rules ! pair, b)]
 
 upsert :: Sum Int -> (Char, Char) -> PolymerTemplate -> PolymerTemplate
 upsert i = alter (Just . maybe i (<> i))
