@@ -4,12 +4,12 @@
 module Day15 where
 
 import Control.Monad (join, replicateM)
-import Data.Array (Array, assocs, bounds, indices, listArray)
-import Data.Bifunctor (bimap)
+import Data.Array (Array, array, assocs, bounds, indices, listArray)
+import Data.Bifunctor (bimap, first)
 import Data.Bool (bool)
 import Data.Function (on)
 import Data.List (minimumBy)
-import Data.Map (Map, adjust, delete, empty, insert, insertWith, member, notMember, size, toList, (!))
+import Data.Map (Map, adjust, delete, empty, insert, insertWith, member, notMember, size, toList, (!), (!?))
 import Data.Maybe (catMaybes, fromJust, isJust, mapMaybe)
 import Data.Traversable (sequenceA)
 import Data.Tuple.Extra (dupe, second)
@@ -54,11 +54,11 @@ adjacentCoords point = applyToPoint point <$> [goLeft, goRight, goUp, goDown]
 
 type Graph = Map Point (Maybe Int)
 
-dijkstra :: Puzzle -> Int
-dijkstra puzzle = go initialGrah
+dijkstra :: Point -> Point -> Puzzle -> Int
+dijkstra start end puzzle = go initialGrah
   where
     puzzleGraph = foldr (uncurry insert) empty $ assocs puzzle
-    initialGrah = insert (1, 1) (Just 0) $ foldr (`insert` Nothing) empty $ indices puzzle
+    initialGrah = insert start (Just 0) $ foldr (`insert` Nothing) empty $ indices puzzle
 
     go :: Graph -> Int
     go graph =
@@ -66,7 +66,9 @@ dijkstra puzzle = go initialGrah
           graphWithoutCurrentLowest = delete point graph
           points = neighbours point score
           newGraph = updateGraph graphWithoutCurrentLowest points
-       in if size newGraph == 1 then extractRemainingPoint newGraph else go newGraph
+          done = end == fst (lowestRisk newGraph) || size newGraph == 1
+       in if done then snd $ lowestRisk newGraph else go newGraph
+    -- in if size newGraph == 1 then extractRemainingPoint newGraph else go newGraph
 
     extractRemainingPoint = fromJust . snd . head . toList
 
@@ -83,7 +85,45 @@ dijkstra puzzle = go initialGrah
           upsertIfLessRisky' (point, newScore) = adjust (updateScore newScore) point
        in foldr upsertIfLessRisky' graph points
 
-partOne = dijkstra
+partOne :: Puzzle -> Int
+partOne puzzle = dijkstra start end puzzle
+  where
+    (start, end) = bounds puzzle
+
+increment n = head . take (n + 1) $ cycle [1 .. 9]
+
+translate :: (Int, Int) -> Point -> Point
+translate (vi, vj) (i, j) = (vi + i, vj + j)
+
+grow :: Int -> Puzzle -> Puzzle
+grow n puzzle = array (lowerBound, ((n + 1) * height, (n + 1) * width)) newPuzzle'
+  where
+    puzzle' = assocs puzzle
+
+    (lowerBound, upperBound) = bounds puzzle
+    height = fst upperBound - fst lowerBound + 1
+    width = snd upperBound - snd lowerBound + 1
+
+    transaletPuzzleHorizontally :: Int -> [(Point, Int)] -> [(Point, Int)]
+    transaletPuzzleHorizontally n = fmap (first (translate (0, n * width)))
+
+    transaletPuzzleHorizontallyTimes :: Int -> [(Point, Int)] -> [(Point, Int)]
+    transaletPuzzleHorizontallyTimes n p = flip transaletPuzzleHorizontally p =<< [0 .. n]
+
+    transaletPuzzleVertically :: Int -> [(Point, Int)] -> [(Point, Int)]
+    transaletPuzzleVertically n = fmap (first (translate (n * height, 0)))
+
+    transaletPuzzleVerticallyTimes :: Int -> [(Point, Int)] -> [(Point, Int)]
+    transaletPuzzleVerticallyTimes n p = flip transaletPuzzleVertically p =<< [0 .. n]
+
+    newPuzzle' = transaletPuzzleVerticallyTimes n $ transaletPuzzleHorizontallyTimes n puzzle'
+
+partTwo puzzle = dijkstra start end grownPuzzle
+  where
+    grownPuzzle = grow 5 puzzle
+    (start, end) = bounds grownPuzzle
+
+debug s v = trace (s ++ " " ++ show v) v
 
 main :: IO ()
 main = do
@@ -92,4 +132,4 @@ main = do
   putStr "Part one: "
   print $ partOne puzzle
   putStr "Part two: "
-  print "TODO"
+  print $ partTwo puzzle
