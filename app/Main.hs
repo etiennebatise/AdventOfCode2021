@@ -12,6 +12,7 @@ import qualified Day11
 import qualified Day12
 import qualified Day13
 import qualified Day14
+import qualified Day15
 
 main = do
   -- Day01.main
@@ -27,4 +28,5 @@ main = do
   -- Day11.main
   -- Day12.main
   -- Day13.main
-  Day14.main
+  -- Day14.main
+  Day15.main
