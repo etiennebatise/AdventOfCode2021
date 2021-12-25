@@ -12,7 +12,7 @@ unsafeRight :: (Show e) => Either e a -> a
 unsafeRight (Left e) = error $ show e
 unsafeRight (Right r) = r
 
-binToDec l = sum $ map (2 ^) $ findIndices (== 1) $ reverse l
+binToDec l = sum $ map (2 ^) $ elemIndices 1 $ reverse l
 
 charToInt :: Char -> Int
 charToInt = read . (: "")
